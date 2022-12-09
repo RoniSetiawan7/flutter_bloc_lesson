@@ -1,13 +1,17 @@
-import 'package:bloc_lesson/check_auth.dart';
+import 'package:bloc_lesson/dashboard/dashboard.dart';
+import 'package:bloc_lesson/login/login.dart';
 import 'package:bloc_lesson/login/services/login_service.dart';
 import 'package:bloc_lesson/register/services/register_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+late Box _box;
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Hive.initFlutter();
+  await Hive.initFlutter();
+  _box = await Hive.openBox('box');
   runApp(const MyApp());
 }
 
@@ -28,7 +32,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const CheckAuth(),
+        home: _box.get('isAuth', defaultValue: false)
+            ? const DashboardScreen()
+            : const LoginScreen(),
       ),
     );
   }
