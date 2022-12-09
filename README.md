@@ -1,5 +1,6 @@
-# Lesson of Flutter BLoC with HIVE local database
+# Lesson of Flutter BLoC with HIVE
 
-Work In Progress
-- Refactor get data user from register model at dashboard screen (setState to BLoC)
-- Refactor check auth user (setState to BLoC)
+# Status : Finished
+- Flutter login and register app
+- BLoC as state managament
+- HIVE as local database
