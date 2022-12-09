@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 class DashboardScreen extends StatefulWidget {
-  final String? email, password;
-  const DashboardScreen({super.key, this.email, this.password});
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -15,9 +14,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   late Box<Login> _login;
   late Box<Register> _register;
-
   late Box _box;
-  String? myName, myEmail;
 
   @override
   void initState() {
@@ -31,15 +28,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Hive.registerAdapter(RegisterAdapter());
     }
 
+    _box = Hive.box('box');
     _login = await Hive.openBox('login_box');
     _register = await Hive.openBox('register_box');
-
-    _box = await Hive.openBox('box');
-
-    setState(() {
-      myName = _box.get('name');
-      myEmail = _box.get('email');
-    });
   }
 
   @override
@@ -52,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Align(
                 alignment: Alignment.topRight,
-                child: IconButton(
+                child: ElevatedButton.icon(
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -63,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: Colors.blue,
                           ),
                           content: const Text(
-                            'Wanna logout?',
+                            'Do you want to logout?',
                             textAlign: TextAlign.center,
                           ),
                           actions: [
@@ -71,13 +62,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onPressed: () {
                                 logout();
                               },
-                              child: const Text('Yup'),
+                              child: const Text('Yes'),
                             ),
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: const Text('Nah'),
+                              child: const Text('No'),
                             )
                           ],
                         );
@@ -85,11 +76,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     );
                   },
                   icon: const Icon(Icons.logout),
+                  label: const Text('Logout'),
                 ),
               ),
               Align(
                 alignment: Alignment.topLeft,
-                child: TextButton(
+                child: ElevatedButton.icon(
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -100,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: Colors.blue,
                           ),
                           content: const Text(
-                            'Are you sure to logout and delete your data?',
+                            'Are you sure want to delete your data then logout?',
                             textAlign: TextAlign.center,
                           ),
                           actions: [
@@ -108,24 +100,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onPressed: () {
                                 logoutAndDeleteData();
                               },
-                              child: const Text('Yup'),
+                              child: const Text('Yes'),
                             ),
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: const Text('Nah'),
+                              child: const Text('No'),
                             )
                           ],
                         );
                       },
                     );
                   },
-                  child: const Text(
-                    'Delete my data\nand logout',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
+                  icon: const Icon(Icons.close),
+                  label: const Text('Delete Account'),
                 ),
               ),
               Center(
@@ -139,9 +128,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    Text('Name : $myName'),
+                    Text('Name : ${_box.get('name')}'),
                     const SizedBox(height: 10),
-                    Text('Email : $myEmail'),
+                    Text('Email : ${_box.get('email')}'),
                     const SizedBox(height: 20)
                   ],
                 ),
@@ -154,6 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void logout() async {
+    _box.delete('isAuth');
     _login.clear().then(
       (_) {
         Navigator.pushAndRemoveUntil(
